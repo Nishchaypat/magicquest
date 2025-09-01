@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagicQuest - Your Magical Story Adventure!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5em 0.75em;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.375rem;
+        }
+        .badge-icon { margin-right: 0.5em; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-200 via-indigo-200 to-blue-200 min-h-screen">
+    <nav>
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a class="text-2xl font-bold text-purple-700" href="/">MagicQuest</a>
+            <a class="text-purple-700 hover:text-purple-900" href="/dashboard">Parental Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Ask a Magical Question!</h1>
+                <p class="text-gray-600">What are you curious about today?</p>
+            </div>
+            
+            <div class="mb-6">
+                <textarea id="question" 
+                    class="w-full p-4 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+                    placeholder="e.g., Why is the sky blue?" rows="3"></textarea>
+            </div>
+            
+            <button id="submit" 
+                class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-bold text-lg hover:bg-purple-700 transition-transform transform hover:scale-105">
+                ✨ Weave a Story ✨
+            </button>
+
+            <!-- Story Display -->
+            <div id="storyContainer" class="hidden mt-8">
+                <div class="bg-purple-50 border-l-4 border-purple-500 rounded-r-lg p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-purple-800 mb-3">Your Magical Story:</h3>
+                    <p id="story" class="text-gray-700 text-lg"></p>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-r-lg p-6">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">🎓 Learning Badge Unlocked!</h3>
+                    <div class="flex items-center mb-3">
+                        <span id="badge" class="badge bg-blue-200 text-blue-800">
+                            <span id="badgeIcon" class="badge-icon"></span>
+                            <span id="badgeText"></span>
+                        </span>
+                    </div>
+                    <p id="learningPoint" class="text-gray-700"></p>
+                </div>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg p-6 mt-6">
+                    <h3 class="text-xl font-bold text-yellow-800 mb-2">Your Learning Path:</h3>
+                    <p id="learningPathBadge" class="text-gray-700 font-semibold"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submit').addEventListener('click', async () => {
+            const question = document.getElementById('question').value;
+            if (!question) return;
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                const data = await response.json();
+                displayStory(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function displayStory(data) {
+            document.getElementById('storyContainer').classList.remove('hidden');
+            document.getElementById('story').textContent = data.story;
+            document.getElementById('learningPoint').textContent = data.learning_point;
+            document.getElementById('badgeIcon').textContent = data.badge_icon;
+            document.getElementById('badgeText').textContent = data.badge;
+            document.getElementById('learningPathBadge').textContent = `You are a ${data.learning_path_badge} explorer!`;
+        }
+    </script>
+</body>
+</html>
